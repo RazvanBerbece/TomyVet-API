@@ -1,5 +1,7 @@
 /* -------------- Requires & Port init -------------- */
 
+require('dotenv').config();
+
 const express = require('express');
 
 const app = express();
@@ -12,6 +14,8 @@ var multer = require('multer');
 
 const emailerImport = require('./Emailer/client');
 var upload = multer();
+
+const ShopifyManager = require('./Shopify/mainStoreHandling');
 
 /* -------------- Cors() amd body-parser -------------- */
 
@@ -28,14 +32,44 @@ app.use(express.static('public'));
 /* -------------- CRUD -------------- */
 
 app.get('/', (req, res) => { // Testing server is listening
-    res.send('Server listening ...')
+    res.json({"200" : "listening..."});
 });
 
 app.post('/sendEmail', (req, res) => {
     const Emailer = new emailerImport();
-    console.log(req.body.email);
-    const result = Emailer.sendMail(req.body.email);
-    res.send(result);
+    res.setHeader('Content-Type', 'application/json');
+    Emailer.sendMailToTeams(req.body, (successfullySent) => {
+        console.log(successfullySent);
+        if (successfullySent == 2) {
+            res.sendStatus(200);
+        }
+        else {
+            res.sendStatus(500);
+        }
+    });
+});
+
+app.get('/getAllProducts', (req, res) => {
+    const shopifyManager = new ShopifyManager(process.env)
+    var productsList = [];
+    shopifyManager.getAllProducts((err, products) => {
+        if (!err) {
+            /**
+             * TODO
+             * GET JSON RESPONSE AND CREATE OBJECT INSTANCE OF A PRODUCT
+             */
+            productsList = products;
+        }
+        else {
+            productsList = undefined;
+        }
+        if (productsList !== undefined) {
+            res.json({"200": `${productsList[0].title}`});
+        }
+        else {
+            res.json({"500": `error`});
+        }
+    });
 });
 
 /* -------------- Listening -------------- */
