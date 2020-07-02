@@ -54,20 +54,23 @@ app.get('/getAllProducts', (req, res) => {
     var productsList = [];
     shopifyManager.getAllProducts((err, products) => {
         if (!err) {
-            /**
-             * TODO
-             * GET JSON RESPONSE AND CREATE OBJECT INSTANCE OF A PRODUCT
-             */
             productsList = products;
         }
         else {
             productsList = undefined;
         }
         if (productsList !== undefined) {
-            res.json({"200": `${productsList[0].title}`});
+            var dictList = [];
+            for (var i in productsList) {
+                dictList.push(productsList[i].dictionary);
+            }
+            res.json({
+                "status": 200,
+                "products": dictList
+            });
         }
         else {
-            res.json({"500": `error`});
+            res.json({"status": 500});
         }
     });
 });

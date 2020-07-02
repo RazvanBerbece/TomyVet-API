@@ -1,4 +1,5 @@
 var shopifyAPI = require('shopify-node-api');
+const Product = require("./Classes/Product");
  
 class ShopifyManager {
 
@@ -14,9 +15,13 @@ class ShopifyManager {
     /* Gets a list of all the products in the store */
     getAllProducts(callback) {
         this.Shopify.get('/admin/products.json', (err, data, headers) => {
+            var productObjectsList = [];
             if (!err) {
-                console.log(data.products);
-                callback(null, data.products);
+                // console.log(data.products[0].id);
+                for (var i = 0; i < data.products.length; i++) {
+                    productObjectsList.push(new Product(data.products[i]));
+                }
+                callback(null, productObjectsList);
             }
             else {
                 callback(err, null)
