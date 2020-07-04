@@ -2,24 +2,24 @@
 class Product {
 
     constructor(data) {
-        this.id = data.id;
+        this.id = data.variants[0].id;
         this.title = data.title;
-        this.desc = data.body_html;
+        this.desc = data.description;
         this.vendor = data.vendor;
         this.price = data.variants[0].price;
         this.productType = data.product_type;
-        this.createdAt = data.created_at;
-        this.images = [];
+        this.createdAt = data.createdAt;
+        this.images = data.images;
         this.thumbSrc = "";
-        if (data.image) {
-            this.thumbSrc = data.image.src;
+        if (data.images.length) {
+            this.thumbSrc = data.images[0].src;
         }
     }
 
     get dictionary() {
         return (
             {
-                "id": `${this.id}`,
+                "id": this.id,
                 "title": this.title,
                 "desc": this.desc,
                 "vendor": this.vendor,

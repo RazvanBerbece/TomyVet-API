@@ -10,7 +10,7 @@ const port = 5001;
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
-var multer = require('multer');
+const multer = require('multer');
 
 const emailerImport = require('./Emailer/client');
 var upload = multer();
@@ -70,7 +70,22 @@ app.get('/getAllProducts', (req, res) => {
             });
         }
         else {
-            res.json({"status": 500});
+            res.sendStatus(500);
+        }
+    });
+});
+
+app.post('/checkout', (req, res) => {
+    const shopifyManager = new ShopifyManager(process.env);
+    shopifyManager.getCheckoutForOrder(req.body.products, (checkout) => {
+        if (checkout) {
+            res.json({
+                "status": 200,
+                "weburl": checkout
+            });
+        }
+        else {
+            res.sendStatus(500);
         }
     });
 });
